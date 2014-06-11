@@ -34,14 +34,15 @@ If we want to evaluate an algorithm to minimise the LASSO problem
 ```
     0.5 * ||X * b - y||² + l * |b|,            (2)
 ```
-where `|.|` is the L1-norm, then we need to use e.g. cross-validation to find
-`l`. But the found `l` is very likely suboptimal, and in any case, we are
-forced to compare the solution to (1), which is not sparse.
+where `||.||²` is the squared L2-norm and `|.|` is the L1-norm, then we need to
+use e.g. cross-validation to find `l`. But the found `l` is very likely
+suboptimal, and in any case, we are forced to compare the solution to (1),
+which is not sparse.
 
 This package thus provides the solution that minimises (2), instead of
-(1), namely `b*` `l`. Which means that you will be able to compare both speed,
-sensitivity to noise, correlation, etc., and the actual solutions of different
-minimisation algorithms.
+(1), namely `b*` and `l`. Which means that you will be able to compare both
+speed, sensitivity to noise, correlation, etc., and the actual solutions of
+different minimisation algorithms.
 
 With this package, `pylearn-simulate`, it is straight-forward to generate such
 data. `pylearn-simulate` is written for Python 2.7.x.
