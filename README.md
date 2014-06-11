@@ -28,11 +28,11 @@ simulated data.
 
 Oftentimes in linear regression, simulated data are generated such that
 ```
-    y = X * b* + e.                            (1)
+  (1)    y = X * b* + e.
 ```
 If we want to evaluate an algorithm to minimise the LASSO problem
 ```
-    0.5 * ||X * b - y||² + l * |b|,            (2)
+  (2)    0.5 * ||X * b - y||² + l * |b|,
 ```
 where `||.||²` is the squared L2-norm and `|.|` is the L1-norm, then we need to
 use e.g. cross-validation to find `l`. But the found `l` is very likely
