@@ -46,3 +46,35 @@ different minimisation algorithms.
 
 With this package, `pylearn-simulate`, it is straight-forward to generate such
 data. `pylearn-simulate` is written for Python 2.7.x.
+
+
+
+
+
+Dependencies
+------------
+The reference environment for pylearn-simulate is Ubuntu 12.04 LTS with
+Python 2.7.3, Numpy 1.6.1 and Scipy 0.9.0. More recent versions likely work,
+but have not been tested thoroughly.
+
+Unless you already have Numpy and Scipy installed, you need to install them:
+```
+$ sudo apt-get install python-numpy python-scipy
+```
+
+In order to run the tests, you may also need to install Nose:
+```
+$ sudo apt-get install python-nose
+```
+
+In order to show plots, you may need to install Matplotlib:
+```
+$ sudo apt-get install python-matplotlib
+```
+
+Unless you have your own minimising software, we recommend that you download
+and install [pylearn-parsimony](https://github.com/neurospin/pylearn-parsimony)
+([https://github.com/neurospin/pylearn-parsimony](https://github.com/neurospin/pylearn-parsimony)).
+While pylearn-parsimony is not a requirement to use pylearn-simulate, the
+examples are using it. Thu, in order to to run all parts of the examples, you
+will need pylearn-parsimony.
