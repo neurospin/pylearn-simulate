@@ -76,5 +76,5 @@ Unless you have your own minimising software, we recommend that you download
 and install [pylearn-parsimony](https://github.com/neurospin/pylearn-parsimony)
 ([https://github.com/neurospin/pylearn-parsimony](https://github.com/neurospin/pylearn-parsimony)).
 While pylearn-parsimony is not a requirement to use pylearn-simulate, the
-examples are using it. Thu, in order to to run all parts of the examples, you
+examples are using it. Thus, in order to to run all parts of the examples, you
 will need pylearn-parsimony.

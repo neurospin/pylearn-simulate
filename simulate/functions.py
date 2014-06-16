@@ -429,9 +429,9 @@ class TotalVariation(Function):
 
 class GroupLasso(Function):
 
-    def __init__(self, l, A, rng=RandomUniform(-1, 1)):
+    def __init__(self, l, A, rng=RandomUniform(-1, 1), **kwargs):
 
-        super(GroupLasso, self).__init__(l, A, rng=rng)
+        super(GroupLasso, self).__init__(l, A, rng=rng, **kwargs)
 
     def grad(self, x):
         """Gradient of the function
