@@ -42,8 +42,9 @@ def lr_en_gl():
     k = 1.0 - l  # Ridge (L2) coefficient
     g = 1.618    # TV coefficient
 
-    A = simulate.functions.GroupLasso.A_from_groups(p, groups, weights=None,
-                                                    penalty_start=1)
+    A = simulate.functions.SmoothedGroupLasso.A_from_groups(p, groups,
+                                                            weights=None,
+                                                            penalty_start=1)
 
     np.random.seed(42)
     penalties = [simulate.functions.L1(l),
@@ -101,7 +102,7 @@ def lr_en_gl():
         k = 1.0 - l
         for j in range(len(gs)):
             g = gs[j]
-#            print "l:", l, ", g:", g
+            print "l:", l, ", g:", g
 
             function = LinearRegressionL1L2GL(X, y, l, k, g, A=A,
                                               penalty_start=1, mean=False)
@@ -119,8 +120,8 @@ def lr_en_gl():
 #            print err_beta
 #            print err_f
 
-#    print "err_beta:\n", err_beta
-#    print "err_f:\n", err_f
+    print "err_beta:\n", err_beta
+    print "err_f:\n", err_f
 
     from mpl_toolkits.mplot3d import proj3d
     from matplotlib import cm
@@ -147,7 +148,7 @@ def lr_en_gl():
     plot.ylabel("$\gamma$", fontsize=14)
     plot.title(r"$f(\beta^{(k)}) - f(\beta^*)$", fontsize=16)
 
-    x, y, _ = proj3d.proj_transform(l, g, np.min(Z), ax.get_proj())
+    x, y, _ = proj3d.proj_transform(0.618, 1.618, np.min(Z), ax.get_proj())
     label = pylab.annotate(
         "$(0.618, 1.618)$", fontsize=14, xy=(x, y), xytext=(60, 20),
         textcoords='offset points', ha='right', va='bottom', color="white",
@@ -156,7 +157,7 @@ def lr_en_gl():
                         color="white"))
 
     def update_position(e):
-        x, y, _ = proj3d.proj_transform(0.5, 1.0, np.min(Z), ax.get_proj())
+        x, y, _ = proj3d.proj_transform(0.618, 1.618, np.min(Z), ax.get_proj())
         label.xy = x, y
         label.update_positions(fig.canvas.renderer)
         fig.canvas.draw()

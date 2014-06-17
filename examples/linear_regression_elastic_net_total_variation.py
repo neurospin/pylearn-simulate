@@ -95,7 +95,7 @@ def lr_en_tv():
         l = 1.0 - k
         for j in range(len(gs)):
             g = gs[j]
-#            print "k:", k, ", g:", g
+            print "k:", k, ", g:", g
 
             function = LinearRegressionL1L2TV(X, y, k, l, g, A=A,
                                               penalty_start=0, mean=False)
@@ -113,8 +113,8 @@ def lr_en_tv():
 #            print err_beta
 #            print err_f
 
-#    print "err_beta:\n", err_beta
-#    print "err_f:\n", err_f
+    print "err_beta:\n", err_beta
+    print "err_f:\n", err_f
 
     from mpl_toolkits.mplot3d import proj3d
     from matplotlib import cm
