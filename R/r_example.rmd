@@ -521,7 +521,7 @@ The transformation we propose allows to transform a real data set ($X_0$) by har
 
 Choosing appropriate parameter values depends essentially on the application. One could want to radically change the original data set in order to clearly encode the penalty in the problem or one could want to generate a slightly different data set to evaluate the robustness of the tested analysis. 
 
-In our application, we have three groups : HLA, COG and MOT. The first group is supposed to have no effect whatsoever on the difference between patients and controls. The two last ones supposedly have a strong effect for the MOT genes and a lesser effect for the COG genes. We see on the next Figure that these groups of genes are very difficultly differentiable on the real data set. After applying our scaling procedure, we see that the different groups of genes now cluster together. 
+In our application, we have three groups: HLA, COG and MOT. The first group is supposed to have no effect whatsoever on the difference between patients and controls. The two last ones supposedly have a strong effect for the MOT genes and a lesser effect for the COG genes. We see on the next Figure that these groups of genes are very difficultly differentiable on the real data set. After applying our scaling procedure, we see that the different groups of genes now cluster together. 
 
 In the following, `norm2` corresponds to the $\ell_2$ norm function, $n$ is the number of individuals and $p$ the number of variables.
 ```{r aux_func}
@@ -571,7 +571,7 @@ pheatmap(X_0, annotation=data.frame(annot_genes, gene_names), main="Before trans
 pheatmap(X, annotation=data.frame(annot_genes, gene_names), main="After transformation")
 ```
 
-### Testing an Adapted Minisation Algorithm on the Simulated Data Set
+### Testing an Adapted Minimisation Algorithm on the Simulated Data Set
 
 Once the data set $(X, y)$ is generated, we can apply any minimisation algorithm (aiming at minimising a Ridge Regression with a Group LASSO penalty) on this dataset, knowing that the solution should be as close as possible to the known $\beta^*$ and that the correct value for the penalisation parameter of the Group LASSO penalty is equal to 1.
 
