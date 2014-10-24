@@ -5,7 +5,7 @@ Created on Mon Jun 18 09:26:14 2013
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
-@email:   tommy.loefstedt@cea.fr
+@email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
 import beta
