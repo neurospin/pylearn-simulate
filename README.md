@@ -83,6 +83,16 @@ will need pylearn-parsimony.
 
 
 
+Installation
+------------
+Download `pylearn-simulate` and put it in your `PYTHONPATH`. Alternatively,
+put the directory `pylearn-simulate/simulate/` in the directory of your
+project.
+
+
+
+
+
 Examples
 --------
 See the examples in `pylearn-simulate/examples/`.
