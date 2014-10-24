@@ -16,10 +16,15 @@ __all__ = ["lr_en_tv"]
 
 
 def lr_en_tv():
+    print "======================================================================="
+    print "=== Example with linear regression, elastic net and total variation ==="
+    print "======================================================================="
+
     np.random.seed(42)
 
     test = False
 
+    # Generate start values.
     shape = (4, 4, 4)
     n, p = 48, np.prod(shape)
 
@@ -34,12 +39,14 @@ def lr_en_tv():
     beta[0:p / 2, :] = 0.0
     snr = 100.0
 
-    l = 0.5  # L1 coefficient
-    k = 0.5  # Ridge (L2) coefficient
-    g = 1.0  # TV coefficient
+    l = 0.5  # L1 coefficient.
+    k = 0.5  # Ridge (L2) coefficient.
+    g = 1.0  # TV coefficient.
 
+    # Create linear operator
     A = simulate.functions.TotalVariation.A_from_shape(shape)
 
+    # Create optimisation problem.
     np.random.seed(42)
     penalties = [simulate.functions.L1(l),
                  simulate.functions.L2Squared(k),
@@ -47,16 +54,17 @@ def lr_en_tv():
     lr = simulate.LinearRegressionData(penalties, M, e, snr=snr,
                                        intercept=False)
 
+    # Generate simulated data.
     X, y, beta_star = lr.load(beta)
 
     try:
         import parsimony.estimators as estimators
-        from parsimony.algorithms.primaldual import StaticCONESTA
+        from parsimony.algorithms.proximal import CONESTA
         from parsimony.functions.combinedfunctions \
                 import LinearRegressionL1L2TV
     except ImportError:
-        print "pylearn-parsimony is not installed. Will not fit a model to " \
-              "the data."
+        print "pylearn-parsimony is not properly installed. Will not fit a " \
+              "model to the data."
         return
 
     if test:
@@ -85,11 +93,12 @@ def lr_en_tv():
 
     # Find a good starting point.
     lr = estimators.LinearRegressionL1L2TV(l1=l, l2=k, tv=g, A=A,
-                                     algorithm=StaticCONESTA(max_iter=max_iter,
-                                                             eps=eps),
+                                     algorithm=CONESTA(max_iter=max_iter,
+                                                       eps=eps),
                                      mean=False)
     beta = lr.fit(X, y, beta).beta
 
+    # Perform grid search.
     for i in range(len(ks)):
         k = ks[i]
         l = 1.0 - k
@@ -101,8 +110,8 @@ def lr_en_tv():
                                               penalty_start=0, mean=False)
 
             lr = estimators.LinearRegressionL1L2TV(l1=l, l2=k, tv=g, A=A,
-                                     algorithm=StaticCONESTA(max_iter=max_iter,
-                                                             eps=eps),
+                                     algorithm=CONESTA(max_iter=max_iter,
+                                                       eps=eps),
                                      mean=False)
             beta = lr.fit(X, y, beta).beta
 
@@ -124,6 +133,7 @@ def lr_en_tv():
 
     np.random.seed(42)
 
+    # Plot results.
     fig = plot.figure()
     ax = fig.gca(projection='3d')
 

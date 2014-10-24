@@ -78,3 +78,11 @@ and install [pylearn-parsimony](https://github.com/neurospin/pylearn-parsimony)
 While pylearn-parsimony is not a requirement to use pylearn-simulate, the
 examples are using it. Thus, in order to to run all parts of the examples, you
 will need pylearn-parsimony.
+
+
+
+
+
+Examples
+--------
+See the examples in `pylearn-simulate/examples/`.

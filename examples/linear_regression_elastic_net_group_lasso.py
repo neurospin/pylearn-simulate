@@ -16,10 +16,15 @@ __all__ = ["lr_en_gl"]
 
 
 def lr_en_gl():
+    print "==================================================================="
+    print "=== Example with linear regression, elastic net and group lasso ==="
+    print "==================================================================="
+
     np.random.seed(42)
 
     test = False
 
+    # Generate start values.
     n, p = 48, 64 + 1
     groups = [range(1, 2 * p / 3), range(p / 3, p)]
 
@@ -38,10 +43,11 @@ def lr_en_gl():
 
     snr = 100.0
 
-    l = 0.618    # L1 coefficient
-    k = 1.0 - l  # Ridge (L2) coefficient
-    g = 1.618    # TV coefficient
+    l = 0.618    # L1 coefficient.
+    k = 1.0 - l  # Ridge (L2) coefficient.
+    g = 1.618    # TV coefficient.
 
+    # Create linear operator
     A = simulate.functions.SmoothedGroupLasso.A_from_groups(p, groups,
                                                             weights=None,
                                                             penalty_start=1)
@@ -54,16 +60,17 @@ def lr_en_gl():
     lr = simulate.LinearRegressionData(penalties, M, e, snr=snr,
                                        intercept=True)
 
+    # Generate simulated data.
     X, y, beta_star = lr.load(beta)
 
     try:
         import parsimony.estimators as estimators
-        from parsimony.algorithms.primaldual import StaticCONESTA
+        from parsimony.algorithms.proximal import CONESTA
         from parsimony.functions.combinedfunctions \
                 import LinearRegressionL1L2GL
     except ImportError:
-        print "pylearn-parsimony is not installed. Will not fit a model to " \
-              "the data."
+        print "pylearn-parsimony is not properly installed. Will not fit a " \
+              "model to the data."
         return
 
     if test:
@@ -92,11 +99,12 @@ def lr_en_gl():
 
     # Find a good starting point.
     lr = estimators.LinearRegressionL1L2GL(l1=l, l2=k, gl=g, A=A,
-                                     algorithm=StaticCONESTA(max_iter=max_iter,
-                                                             eps=eps),
+                                     algorithm=CONESTA(max_iter=max_iter,
+                                                       eps=eps),
                                      penalty_start=1, mean=False)
     beta = lr.fit(X, y, beta).beta
 
+    # Perform grid search.
     for i in range(len(ls)):
         l = ls[i]
         k = 1.0 - l
@@ -108,8 +116,8 @@ def lr_en_gl():
                                               penalty_start=1, mean=False)
 
             lr = estimators.LinearRegressionL1L2GL(l1=l, l2=k, gl=g, A=A,
-                                     algorithm=StaticCONESTA(max_iter=max_iter,
-                                                             eps=eps),
+                                     algorithm=CONESTA(max_iter=max_iter,
+                                                       eps=eps),
                                      penalty_start=1, mean=False)
             beta = lr.fit(X, y, beta).beta
 
@@ -131,6 +139,7 @@ def lr_en_gl():
 
     np.random.seed(42)
 
+    # Plot results.
     fig = plot.figure()
     ax = fig.gca(projection='3d')
 
