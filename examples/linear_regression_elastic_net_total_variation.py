@@ -43,6 +43,16 @@ def lr_en_tv():
     k = 0.5  # Ridge (L2) coefficient.
     g = 1.0  # TV coefficient.
 
+    if test:
+        max_iter = 5000
+        n_vals = 3
+        eps = 1e-5
+    else:
+        max_iter = 10000
+        n_vals = 21
+        eps = 5e-6
+        mu = 5e-7
+
     # Create linear operator
     A = simulate.functions.TotalVariation.A_from_shape(shape)
 
@@ -59,7 +69,7 @@ def lr_en_tv():
 
     try:
         import parsimony.estimators as estimators
-        from parsimony.algorithms.proximal import CONESTA
+        from parsimony.algorithms.proximal import FISTA, CONESTA
         from parsimony.functions.combinedfunctions \
                 import LinearRegressionL1L2TV
     except ImportError:
@@ -67,17 +77,8 @@ def lr_en_tv():
               "model to the data."
         return
 
-    if test:
-        max_iter = 5000
-        n_vals = 3
-        eps = 1e-5
-    else:
-        max_iter = 10000
-        n_vals = 21
-        eps = 1e-6
-
-    ks = np.linspace(0.25, 0.75, n_vals).tolist()
-    gs = np.linspace(0.75, 1.25, n_vals).tolist()
+    ks = np.linspace(k - 0.25, k + 0.25, n_vals).tolist()
+    gs = np.linspace(g - 0.25, g + 0.25, n_vals).tolist()
 
 #    print "ks:", ks
 #    print "gs:", gs
@@ -92,9 +93,9 @@ def lr_en_tv():
     g = gs[0]
 
     # Find a good starting point.
-    lr = estimators.LinearRegressionL1L2TV(l1=l, l2=k, tv=g, A=A,
-                                     algorithm=CONESTA(max_iter=max_iter,
-                                                       eps=eps),
+    lr = estimators.LinearRegressionL1L2TV(l, k, g, A=A, mu=mu,
+                                     algorithm=FISTA(max_iter=max_iter,
+                                                     eps=eps),
                                      mean=False)
     beta = lr.fit(X, y, beta).beta
 
@@ -106,10 +107,10 @@ def lr_en_tv():
             g = gs[j]
             print "k:", k, ", g:", g
 
-            function = LinearRegressionL1L2TV(X, y, k, l, g, A=A,
+            function = LinearRegressionL1L2TV(X, y, l, k, g, A=A, mu=mu,
                                               penalty_start=0, mean=False)
 
-            lr = estimators.LinearRegressionL1L2TV(l1=l, l2=k, tv=g, A=A,
+            lr = estimators.LinearRegressionL1L2TV(l, k, g, A=A, mu=mu,
                                      algorithm=CONESTA(max_iter=max_iter,
                                                        eps=eps),
                                      mean=False)

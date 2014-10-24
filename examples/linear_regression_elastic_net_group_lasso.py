@@ -47,11 +47,21 @@ def lr_en_gl():
     k = 1.0 - l  # Ridge (L2) coefficient.
     g = 1.618    # TV coefficient.
 
+    if test:
+        max_iter = 5000
+        n_vals = 3
+        eps = 1e-5
+    else:
+        max_iter = 10000
+        n_vals = 21
+        eps = 1e-6
+
     # Create linear operator
     A = simulate.functions.SmoothedGroupLasso.A_from_groups(p, groups,
                                                             weights=None,
                                                             penalty_start=1)
 
+    # Create optimisation problem.
     np.random.seed(42)
     penalties = [simulate.functions.L1(l),
                  simulate.functions.L2Squared(k),
@@ -72,15 +82,6 @@ def lr_en_gl():
         print "pylearn-parsimony is not properly installed. Will not fit a " \
               "model to the data."
         return
-
-    if test:
-        max_iter = 5000
-        n_vals = 3
-        eps = 1e-5
-    else:
-        max_iter = 10000
-        n_vals = 21
-        eps = 1e-6
 
     ls = np.linspace(l - 0.25, l + 0.25, n_vals).tolist()
     gs = np.linspace(g - 0.25, g + 0.25, n_vals).tolist()
