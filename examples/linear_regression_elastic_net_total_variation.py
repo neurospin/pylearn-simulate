@@ -24,80 +24,81 @@ def lr_en_tv():
 
     test = False
 
-    # Generate start values.
     shape = (4, 4, 4)
     n, p = 48, np.prod(shape)
 
-    alpha = 1.0
-    Sigma = alpha * np.eye(p, p) \
-          + (1.0 - alpha) * np.random.randn(p, p)
-    mean = np.zeros(p)
-    M = np.random.multivariate_normal(mean, Sigma, n)
+    # Generate candidate data.
+    beta = simulate.beta.random((p, 1), density=0.5, sort=True)
+    Sigma = simulate.correlation_matrices.constant_correlation(p=p, rho=0.01,
+                                                               eps=0.001)
+    X0 = np.random.multivariate_normal(np.zeros(p), Sigma, n)
     e = np.random.randn(n, 1)
-    beta = np.random.rand(p, 1)
-    beta = np.sort(beta, axis=0)
-    beta[0:p / 2, :] = 0.0
-    snr = 100.0
 
-    l = 0.5  # L1 coefficient.
+    # Generate the linear operator for total variation.
+    A = simulate.functions.TotalVariation.A_from_shape(shape)
+
+    # Regularisation parameters
     k = 0.5  # Ridge (L2) coefficient.
+    l = 1.0 - k  # L1 coefficient.
     g = 1.0  # TV coefficient.
 
+    # Create the optimisation problem.
+    np.random.seed(42)
+    l1 = simulate.functions.L1(l)
+    l2 = simulate.functions.L2Squared(k)
+    tv = simulate.functions.TotalVariation(g, A)
+    lr = simulate.LinearRegressionData([l1, l2, tv], X0, e, snr=3.0,
+                                       intercept=False)
+
+    # Generate simulated data.
+    X, y, beta_star, e = lr.load(beta)
+
+    # Define algorithm parameters.
     if test:
         max_iter = 5000
         n_vals = 3
         eps = 1e-5
+        mu = 5e-6
     else:
         max_iter = 10000
         n_vals = 21
         eps = 5e-6
         mu = 5e-7
 
-    # Create linear operator
-    A = simulate.functions.TotalVariation.A_from_shape(shape)
-
-    # Create optimisation problem.
-    np.random.seed(42)
-    penalties = [simulate.functions.L1(l),
-                 simulate.functions.L2Squared(k),
-                 simulate.functions.TotalVariation(g, A)]
-    lr = simulate.LinearRegressionData(penalties, M, e, snr=snr,
-                                       intercept=False)
-
-    # Generate simulated data.
-    X, y, beta_star = lr.load(beta)
-
     try:
         import parsimony.estimators as estimators
-        from parsimony.algorithms.proximal import FISTA, CONESTA
+        from parsimony.algorithms.proximal import CONESTA
         from parsimony.functions.combinedfunctions \
                 import LinearRegressionL1L2TV
     except ImportError:
-        print "pylearn-parsimony is not properly installed. Will not fit a " \
-              "model to the data."
+        print "pylearn-parsimony is not properly installed. Will not be " \
+              "able to fit a model to the data."
         return
 
     ks = np.linspace(k - 0.25, k + 0.25, n_vals).tolist()
     gs = np.linspace(g - 0.25, g + 0.25, n_vals).tolist()
 
-#    print "ks:", ks
-#    print "gs:", gs
-
-    beta = np.random.rand(p, 1)
+    # Precomputed start vector.
+    beta = [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, -6.94158777e-08,
+            -1.85184916e-09, 0.00000000e+00, 6.09145975e-09, 0.00000000e+00,
+            0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
+            4.68357405e-09, 2.04393050e-05, 8.09542282e-08, 0.00000000e+00,
+            0.00000000e+00, 0.00000000e+00, -2.68424831e-07, 0.00000000e+00,
+            0.00000000e+00, 0.00000000e+00, -3.62668134e-07, 0.00000000e+00,
+            0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
+            0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
+            8.51958165e-07, 7.31258938e-07, 4.40944394e-07, 2.38028138e-03,
+            2.53099740e-02, 1.33822793e-02, 6.79371496e-02, 1.04168020e-02,
+            1.18304478e-06, 1.30844134e-06, 3.85488413e-03, 3.69889317e-02,
+            8.91117508e-02, 5.86153319e-02, 8.51613851e-02, 8.93381453e-02,
+            4.23168278e-02, 1.40616487e-01, 2.04455165e-01, 1.97578031e-01,
+            2.64825748e-01, 2.64873032e-01, 2.69791537e-01, 2.71948706e-01,
+            2.65233980e-01, 3.03929919e-01, 2.95572793e-01, 3.38838489e-01,
+            3.43273009e-01, 3.80302127e-01, 4.35270115e-01, 4.37044532e-01]
+    beta = np.array(beta).reshape(p, 1)
 
     err_beta = np.zeros((n_vals, n_vals))
     err_f = np.zeros((n_vals, n_vals))
-
-    k = ks[0]
-    l = 1.0 - k
-    g = gs[0]
-
-    # Find a good starting point.
-    lr = estimators.LinearRegressionL1L2TV(l, k, g, A=A, mu=mu,
-                                     algorithm=FISTA(max_iter=max_iter,
-                                                     eps=eps),
-                                     mean=False)
-    beta = lr.fit(X, y, beta).beta
 
     # Perform grid search.
     for i in range(len(ks)):
@@ -107,25 +108,27 @@ def lr_en_tv():
             g = gs[j]
             print "k:", k, ", g:", g
 
+            # Create the loss function.
             function = LinearRegressionL1L2TV(X, y, l, k, g, A=A, mu=mu,
                                               penalty_start=0, mean=False)
 
+            # Create the estimator.
             lr = estimators.LinearRegressionL1L2TV(l, k, g, A=A, mu=mu,
                                      algorithm=CONESTA(max_iter=max_iter,
                                                        eps=eps),
                                      mean=False)
+            # Fit data with the new regularisation parameters.
             beta = lr.fit(X, y, beta).beta
 
+            # Compute output.
             err_beta[i, j] = np.linalg.norm(beta - beta_star)
             err_f[i, j] = np.linalg.norm(function.f(beta) \
                         - function.f(beta_star))
 
-#            print err_beta
-#            print err_f
-
     print "err_beta:\n", err_beta
     print "err_f:\n", err_f
 
+    # Plot the results.
     from mpl_toolkits.mplot3d import proj3d
     from matplotlib import cm
     from matplotlib.ticker import LinearLocator, FormatStrFormatter

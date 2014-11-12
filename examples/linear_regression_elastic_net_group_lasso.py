@@ -26,27 +26,43 @@ def lr_en_gl():
 
     # Generate start values.
     n, p = 48, 64 + 1
+
+    # Define the groups.
     groups = [range(1, 2 * p / 3), range(p / 3, p)]
 
-    alpha = 1.0
-    Sigma = alpha * np.eye(p - 1, p - 1) \
-          + (1.0 - alpha) * np.random.randn(p - 1, p - 1)
-    mean = np.zeros(p - 1)
-    M = np.random.multivariate_normal(mean, Sigma, n)
-    M = np.hstack((np.ones((n, 1)), M))
+    # Generate candidate data.
+    beta = simulate.beta.random((p - 1, 1), density=0.5, sort=True)
+    # Add the intercept.
+    beta = np.vstack((np.random.rand(1, 1), beta))
+    Sigma = simulate.correlation_matrices.constant_correlation(p=p - 1, rho=0.01, eps=0.001)
+    X0 = np.random.multivariate_normal(np.zeros(p - 1), Sigma, n)
+    # Add the intercept.
+    X0 = np.hstack((np.ones((n, 1)), X0))
     e = np.random.randn(n, 1)
 
-    beta = np.random.rand(p - 1, 1)
-    beta = np.sort(beta, axis=0)
-    beta[0:(p - 1) / 2, :] = 0.0
-    beta = np.vstack((np.random.rand(1, 1), beta))  # The intercept.
+    # Create linear operator.
+    A = simulate.functions.SmoothedGroupLasso.A_from_groups(p, groups,
+                                                            weights=None,
+                                                            penalty_start=1)
 
-    snr = 100.0
-
+    # Define regularisation parameters.
     l = 0.618    # L1 coefficient.
     k = 1.0 - l  # Ridge (L2) coefficient.
     g = 1.618    # TV coefficient.
 
+    # Create optimisation problem.
+    l1 = simulate.functions.L1(l)
+    l2 = simulate.functions.L2Squared(k)
+    gl = simulate.functions.SmoothedGroupLasso(g, A,
+                                               mu=simulate.utils.TOLERANCE)
+    lr = simulate.LinearRegressionData([l1, l2, gl], X0, e, snr=2.0,
+                                       intercept=True)
+
+    # Generate simulated data.
+    np.random.seed(42)
+    X, y, beta_star, e = lr.load(beta)
+
+    # Define algorithm parameters.
     if test:
         max_iter = 5000
         n_vals = 3
@@ -56,54 +72,34 @@ def lr_en_gl():
         n_vals = 21
         eps = 1e-6
 
-    # Create linear operator
-    A = simulate.functions.SmoothedGroupLasso.A_from_groups(p, groups,
-                                                            weights=None,
-                                                            penalty_start=1)
-
-    # Create optimisation problem.
-    np.random.seed(42)
-    penalties = [simulate.functions.L1(l),
-                 simulate.functions.L2Squared(k),
-                 simulate.functions.SmoothedGroupLasso(g, A,
-                                                  mu=simulate.utils.TOLERANCE)]
-    lr = simulate.LinearRegressionData(penalties, M, e, snr=snr,
-                                       intercept=True)
-
-    # Generate simulated data.
-    X, y, beta_star = lr.load(beta)
-
     try:
         import parsimony.estimators as estimators
         from parsimony.algorithms.proximal import CONESTA
         from parsimony.functions.combinedfunctions \
                 import LinearRegressionL1L2GL
     except ImportError:
-        print "pylearn-parsimony is not properly installed. Will not fit a " \
-              "model to the data."
+        print "pylearn-parsimony is not properly installed. Will not be " \
+              "able to fit a model to the data."
         return
 
     ls = np.linspace(l - 0.25, l + 0.25, n_vals).tolist()
     gs = np.linspace(g - 0.25, g + 0.25, n_vals).tolist()
 
-#    print "ls:", ls
-#    print "gs:", gs
-
-    beta = np.random.rand(p, 1)
+    # Precomputed start vector.
+    beta = [0.07302293, 0., 0.0254573, -0.04505474, -0.03886735, 0.,
+            -0.03806559, 0., 0., 0., 0.01746617, 0., 0., 0., 0., 0., 0., 0.,
+            0., 0., 0., 0., 0.01615937, 0., -0.01359646, 0.02150195, 0.,
+            0.02436873, 0., 0., -0.0272448, 0., 0., 0.04213882, 0.03587526,
+            0.07456545, 0.06753988, 0.12180282, 0.11120493, 0.15486321,
+            0.05453602, 0.16154324, 0.16140251, 0.13619467, 0.20804703,
+            0.1832236, 0.19791729, 0.20980641, 0.15999879, 0.19648151,
+            0.14527259, 0.23884876, 0.26351719, 0.1643164, 0.29524708,
+            0.22982587, 0.26201468, 0.27257074, 0.28497038, 0.2055798,
+            0.31811997, 0.22757443, 0.25140015, 0.28259666, 0.40201002]
+    beta = np.array(beta).reshape(p, 1)
 
     err_beta = np.zeros((n_vals, n_vals))
     err_f = np.zeros((n_vals, n_vals))
-
-    l = ls[0]
-    k = 1.0 - l
-    g = gs[0]
-
-    # Find a good starting point.
-    lr = estimators.LinearRegressionL1L2GL(l1=l, l2=k, gl=g, A=A,
-                                     algorithm=CONESTA(max_iter=max_iter,
-                                                       eps=eps),
-                                     penalty_start=1, mean=False)
-    beta = lr.fit(X, y, beta).beta
 
     # Perform grid search.
     for i in range(len(ls)):
@@ -113,25 +109,27 @@ def lr_en_gl():
             g = gs[j]
             print "l:", l, ", g:", g
 
+            # Create the loss function.
             function = LinearRegressionL1L2GL(X, y, l, k, g, A=A,
                                               penalty_start=1, mean=False)
 
+            # Create the estimator.
             lr = estimators.LinearRegressionL1L2GL(l1=l, l2=k, gl=g, A=A,
                                      algorithm=CONESTA(max_iter=max_iter,
                                                        eps=eps),
                                      penalty_start=1, mean=False)
+            # Fit data with the new regularisation parameters.
             beta = lr.fit(X, y, beta).beta
 
+            # Compute output.
             err_beta[i, j] = np.linalg.norm(beta - beta_star)
             err_f[i, j] = np.linalg.norm(function.f(beta) \
                         - function.f(beta_star))
 
-#            print err_beta
-#            print err_f
-
     print "err_beta:\n", err_beta
     print "err_f:\n", err_f
 
+    # Plot the results.
     from mpl_toolkits.mplot3d import proj3d
     from matplotlib import cm
     from matplotlib.ticker import LinearLocator, FormatStrFormatter

@@ -91,7 +91,7 @@ class LinearRegressionData(SimulatedData):
             self.snr = None
             try:
                 def f(x):
-                    X, y, _ = self.load(x * beta)
+                    X, y, _, _ = self.load(x * beta)
 
 #                    print "snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
 #                       % (old_snr, np.linalg.norm(np.dot(X, x * beta)) \
@@ -131,7 +131,7 @@ class LinearRegressionData(SimulatedData):
 
         y = np.dot(X, beta) - self.e
 
-        return X, y, beta
+        return X, y, beta, self.e
 
 if __name__ == "__main__":
     import doctest
