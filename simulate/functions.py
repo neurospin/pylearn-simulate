@@ -615,8 +615,6 @@ class SmoothedGroupTotalVariation(NesterovFunction):
                 importance of the groups. Default value is the square roots of
                 the group sizes.
         """
-        import parsimony.functions.nesterov.tv as tv
-
         if isinstance(masks, tuple):
             masks = list(masks)
 
@@ -632,7 +630,7 @@ class SmoothedGroupTotalVariation(NesterovFunction):
                 weight = weights[g]
 
             # Compute group A matrix
-            Ag, _ = tv.A_from_subset_mask(mask)
+            Ag, _ = TotalVariation.A_from_subset_mask(mask)
 
             # Include the weights
             if weight != 1.0 and weight != 1:
@@ -670,8 +668,6 @@ class SmoothedGroupTotalVariation(NesterovFunction):
                 importance of the groups. Default value is the square roots of
                 the group sizes.
         """
-        import parsimony.functions.nesterov.tv as tv
-
         A = []
         G = len(rects)
         for g in xrange(G):
@@ -699,7 +695,7 @@ class SmoothedGroupTotalVariation(NesterovFunction):
                 weight = weights[g]
 
             # Compute group A matrix
-            Ag, _ = tv.A_from_subset_mask(mask)
+            Ag, _ = TotalVariation.A_from_subset_mask(mask)
 
             # Include the weights
             if weight != 1.0 and weight != 1:
