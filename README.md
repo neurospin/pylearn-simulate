@@ -81,9 +81,15 @@ will need pylearn-parsimony.
 
 Installation
 ------------
-Download `pylearn-simulate` and put it in your `PYTHONPATH`. Alternatively,
-put the directory `pylearn-simulate/simulate/` in the directory of your
-project.
+### Easiest installation
+Download `pylearn-simulate` and put it in your `PYTHONPATH`. Alternatively, put
+the directory `pylearn-simulate/simulate/` in the directory of your project.
+
+### Recommended installation
+Use setuptools or pip. Download the release of pylearn-simulate from
+[https://github.com/neurospin/pylearn-simulate/releases](https://github.com/neurospin/pylearn-simulate/releases).
+Unpack the file and go to the pylearn-simulate directory. Type
+`python setup.py install` or `pip install -e .`, depending on your preference.
 
 
 
