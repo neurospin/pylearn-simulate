@@ -49,6 +49,6 @@ try:
                                 "test": ["doctest"],
                                }
 except:
-    from distutils.code import setup
+    from distutils.core import setup
 
 setup(**params)
