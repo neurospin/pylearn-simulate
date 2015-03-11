@@ -15,6 +15,8 @@ import utils
 
 from .simulate import LinearRegressionData
 
+__version__ = "0.2"
+
 __all__ = ["LinearRegressionData",
            'beta', 'correlation_matrices', 'functions',
            'utils']

@@ -62,12 +62,8 @@ Unless you already have Numpy and Scipy installed, you need to install them:
 $ sudo apt-get install python-numpy python-scipy
 ```
 
-In order to run the tests, you may also need to install Nose:
-```
-$ sudo apt-get install python-nose
-```
-
-In order to show plots, you may need to install Matplotlib:
+In order to show plots and to run the examples, you may need to install
+Matplotlib:
 ```
 $ sudo apt-get install python-matplotlib
 ```
