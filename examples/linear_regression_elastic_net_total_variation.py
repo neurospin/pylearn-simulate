@@ -69,7 +69,7 @@ def lr_en_tv():
         import parsimony.estimators as estimators
         from parsimony.algorithms.proximal import CONESTA
         from parsimony.functions.combinedfunctions \
-                import LinearRegressionL1L2TV
+            import LinearRegressionL1L2TV
     except ImportError:
         print "pylearn-parsimony is not properly installed. Will not be " \
               "able to fit a model to the data."
@@ -122,8 +122,8 @@ def lr_en_tv():
 
             # Compute output.
             err_beta[i, j] = np.linalg.norm(beta - beta_star)
-            err_f[i, j] = np.linalg.norm(function.f(beta) \
-                        - function.f(beta_star))
+            err_f[i, j] = np.linalg.norm(function.f(beta)
+                                         - function.f(beta_star))
 
     print "err_beta:\n", err_beta
     print "err_f:\n", err_f
@@ -132,34 +132,34 @@ def lr_en_tv():
     from mpl_toolkits.mplot3d import proj3d
     from matplotlib import cm
     from matplotlib.ticker import LinearLocator, FormatStrFormatter
-    import matplotlib.pyplot as plot
+    import matplotlib.pyplot as plt
     import pylab
 
     np.random.seed(42)
 
     # Plot results.
-    fig = plot.figure()
+    fig = plt.figure()
     ax = fig.gca(projection='3d')
 
     X, Y = np.meshgrid(ks, gs)
     Z = err_f
 
     surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
-            antialiased=False, linewidth=0)
+                           antialiased=False, linewidth=0)
     #antialiased=False
     #ax.set_zlim(-1.01, 1.01)
     ax.patch.set_facecolor('none')
     ax.view_init(azim=-45, elev=25)
 
-    plot.xlabel("$\kappa$", fontsize=14)
-    plot.ylabel("$\gamma$", fontsize=14)
-    plot.title(r"$f(\beta^{(k)}) - f(\beta^*)$", fontsize=16)
+    plt.xlabel("$\kappa$", fontsize=14)
+    plt.ylabel("$\gamma$", fontsize=14)
+    plt.title(r"$f(\beta^{(k)}) - f(\beta^*)$", fontsize=16)
 
     x, y, _ = proj3d.proj_transform(0.5, 1.0, np.min(Z), ax.get_proj())
     label = pylab.annotate(
         "$(0.5, 1.0)$", fontsize=14, xy=(x, y), xytext=(50, 20),
         textcoords='offset points', ha='right', va='bottom', color="white",
-    #    bbox=dict(boxstyle='round, pad=0.5', fc='white', alpha=0.5),
+        # bbox=dict(boxstyle='round, pad=0.5', fc='white', alpha=0.5),
         arrowprops=dict(arrowstyle='->', connectionstyle='arc3, rad=0',
                         color="white"))
 
@@ -176,8 +176,8 @@ def lr_en_tv():
 
     fig.colorbar(surf)  # , shrink=0.5, aspect=5)
 
-#    plot.savefig('lr_en_tv.pdf', bbox_inches='tight')
-    plot.show()
+#    plt.savefig('lr_en_tv.pdf', bbox_inches='tight')
+    plt.show()
 
 if __name__ == "__main__":
     lr_en_tv()

@@ -11,7 +11,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import simulate
 
 import numpy as np
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 
 __all__ = ["comparison"]
 
@@ -70,22 +70,22 @@ def comparison():
             0.00469816, 0.0053463, -0.00264778, 0.0153526,  0.0015202,
            -0.02408666, 0.00453764, -0.0053824, -0.02556995, 0.01089147,
            -0.01863037, -0.00212071, -0.00307539, -0.00921482, 0.006925,
-           0.00129344, 0.0281662, -0.00918977, -0.00449054, 0.0056015,
-           0.02220001, 0.00913151, 0.00354939, 0.00156542, 0.00280743,
-           0.03130712, 0.02208781, -0.01251621, 0.01020952, 0.00578535,
-           0.00249149, 0.0176288, 0.00091225, -0.00582973, 0.01615972,
-           0.01877612, -0.00849675, -0.0018213, -0.01855162, -0.01948095,
-           0.02302791, 0.02071631, 0.03381445, 0.00185127, 0.00165616,
-           0.00503767, 0.05038607, -0.01219906, 0.01042271, 0.01825756,
-           0.02385574, 0.03347443, 0.00415551, 0.00362776, 0.02530247,
+            0.00129344, 0.0281662, -0.00918977, -0.00449054, 0.0056015,
+            0.02220001, 0.00913151, 0.00354939, 0.00156542, 0.00280743,
+            0.03130712, 0.02208781, -0.01251621, 0.01020952, 0.00578535,
+            0.00249149, 0.0176288, 0.00091225, -0.00582973, 0.01615972,
+            0.01877612, -0.00849675, -0.0018213, -0.01855162, -0.01948095,
+            0.02302791, 0.02071631, 0.03381445, 0.00185127, 0.00165616,
+            0.00503767, 0.05038607, -0.01219906, 0.01042271, 0.01825756,
+            0.02385574, 0.03347443, 0.00415551, 0.00362776, 0.02530247,
            -0.00496077, 0.02176268, -0.0286928, 0.0230842, 0.00629274,
-           0.01643775, 0.03412733, 0.02470838, 0.04116392, 0.01187356,
-           0.01273421, 0.00365497, 0.02987092, 0.01511648, -0.0004221,
-           0.01879463, 0.04344603, 0.0272033, 0.01224449, 0.04655398,
-           0.01646184, 0.01859317, 0.02223543, 0.01896585, 0.01484756,
-           0.04559962, 0.00328105, 0.02131548, 0.02296882, 0.04799365,
-           0.03204008, 0.01493607, 0.03915278, 0.01379136, 0.03394394,
-           0.0341765]
+            0.01643775, 0.03412733, 0.02470838, 0.04116392, 0.01187356,
+            0.01273421, 0.00365497, 0.02987092, 0.01511648, -0.0004221,
+            0.01879463, 0.04344603, 0.0272033, 0.01224449, 0.04655398,
+            0.01646184, 0.01859317, 0.02223543, 0.01896585, 0.01484756,
+            0.04559962, 0.00328105, 0.02131548, 0.02296882, 0.04799365,
+            0.03204008, 0.01493607, 0.03915278, 0.01379136, 0.03394394,
+            0.0341765]
     beta = np.array(beta).reshape(p + 1, 1)
 
     # Perform grid search
@@ -143,31 +143,31 @@ def comparison():
     beta_cv = en.fit(X, y, beta).beta
 
     # Plot the results
-    plot.rc("text", usetex=True)
-    plot.rc("font", **{"family": "serif", "serif": ["Computer Modern"]})
+    plt.rc("text", usetex=True)
+    plt.rc("font", **{"family": "serif", "serif": ["Computer Modern"]})
 
-    plot.figure()
+    plt.figure()
 
-    plot.subplot(2, 1, 1)
-    plot.plot(ls, CV)
-    plot.xlabel(r"$\lambda$", fontsize=14)
-    plot.ylabel(r"CV error", fontsize=14)
-    plot.title(r"Cross-validated prediction error for different values of " \
+    plt.subplot(2, 1, 1)
+    plt.plot(ls, CV)
+    plt.xlabel(r"$\lambda$", fontsize=14)
+    plt.ylabel(r"CV error", fontsize=14)
+    plt.title(r"Cross-validated prediction error for different values of "
                r"$\lambda$", fontsize=18)
 
-    plot.subplot(2, 1, 2)
-    plot.plot(beta_star, '-g', linewidth=3)
-    plot.plot(beta_sim, '-b')
-    plot.plot(beta_cv, '-r')
-    plot.xlabel(r"$\beta_j$", fontsize=14)
-    plot.legend([r"$\beta^*$",
+    plt.subplot(2, 1, 2)
+    plt.plot(beta_star, '-g', linewidth=3)
+    plt.plot(beta_sim, '-b')
+    plt.plot(beta_cv, '-r')
+    plt.xlabel(r"$\beta_j$", fontsize=14)
+    plt.legend([r"$\beta^*$",
                  r"$\beta_{Sim}$",
                  r"$\beta_{CV}$"],
                 loc=2)
-    plot.title(r"Regression vectors", fontsize=18)
+    plt.title(r"Regression vectors", fontsize=18)
 
-    plot.tight_layout()
-    plot.show()
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     comparison()

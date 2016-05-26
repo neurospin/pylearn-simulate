@@ -17,7 +17,8 @@ TOLERANCE = 5e-8
 
 
 class RandomUniform(object):
-    """
+    """Random number generator that returns a uniformly distributed value.
+
     Example
     -------
     >>> rnd = RandomUniform(-1, 1)
@@ -79,7 +80,7 @@ def norm2(x):
 
 
 def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
-    """ Finds the value of x such that |f(x)|_2 < eps, for x > 0 and where
+    """Finds the value of x such that |f(x)|_2 < eps, for x > 0 and where
     |.|_2 is the 2-norm.
 
     Parameters

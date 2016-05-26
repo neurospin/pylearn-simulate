@@ -46,7 +46,9 @@ class L1(Function):
         super(L1, self).__init__(l, rng=rng)
 
     def grad(self, x):
-        """Sub-gradient of the function
+        """Sub-gradient of the function.
+
+        Corresponds to
 
             f(x) = l * |x|_1,
 
@@ -84,7 +86,9 @@ class SmoothedL1(Function):
         super(SmoothedL1, self).__init__(l, mu=mu)
 
     def grad(self, x):
-        """Gradient of the function
+        """Gradient of the function.
+
+        Corresponds to
 
             f(x) = l * L1(mu, x),
 
@@ -120,7 +124,9 @@ class L2(Function):
         super(L2, self).__init__(l, rng=rng)
 
     def grad(self, x):
-        """Sub-gradient of the function
+        """Sub-gradient of the function.
+
+        Corresponds to
 
             f(x) = l * |x|_2,
 
@@ -165,7 +171,9 @@ class L2Squared(Function):
         super(L2Squared, self).__init__(l)
 
     def grad(self, x):
-        """Gradient of the function
+        """Gradient of the function.
+
+        Corresponds to
 
             f(x) = (l / 2) * |x|²_2,
 
@@ -217,7 +225,7 @@ class NesterovFunction(Function):
         return self.l * Aa
 
     def alpha(self, x):
-        """ Dual variable of the Nesterov function.
+        """Dual variable of the Nesterov function.
         """
         alpha = [0] * len(self.A)
         for i in xrange(len(self.A)):
@@ -247,7 +255,9 @@ class TotalVariation(Function):
         super(TotalVariation, self).__init__(l, A=A, rng=rng, **kwargs)
 
     def grad(self, x):
-        """Gradient of the function
+        """Gradient of the function.
+
+        Corresponds to
 
             f(x) = TotalVariation(x),
 
@@ -271,7 +281,7 @@ class TotalVariation(Function):
             a = self.rng(n_lower)
             grad_Ab_norm2[lower] = (vec_rnd.T * (a / norm_vec)).T
 
-        grad = np.vstack([self.A[i].T.dot(grad_Ab_norm2[:, i]) \
+        grad = np.vstack([self.A[i].T.dot(grad_Ab_norm2[:, i])
                           for i in xrange(len(self.A))])
         grad = grad.sum(axis=0)
 
@@ -284,11 +294,11 @@ class TotalVariation(Function):
 
         Parameters
         ----------
-        shape : List or tuple with 1, 2 or 3 integers. The shape of the 1D, 2D
-                or 3D image. shape has the form (X,), (Y, X) or (Z, Y, X),
-                where Z is the number of "layers", Y is the number of rows and
-                X is the number of columns. The shape does not involve any
-                intercept variables.
+        shape : list or tuple with 1, 2 or 3 int
+            The shape of the 1D, 2D or 3D image. shape has the form (X,),
+            (Y, X) or (Z, Y, X), where Z is the number of "layers", Y is
+            the number of rows and X is the number of columns. The shape
+            does not involve any intercept variables.
         """
         import scipy.sparse as sparse
 
@@ -306,7 +316,7 @@ class TotalVariation(Function):
                  sparse.eye(p, p)
             zind = ind[:, :, -1].ravel()
             for i in zind:
-                Ax.data[Ax.indptr[i]: \
+                Ax.data[Ax.indptr[i]:
                         Ax.indptr[i + 1]] = 0
             Ax.eliminate_zeros()
         else:
@@ -316,7 +326,7 @@ class TotalVariation(Function):
                  sparse.eye(p, p)
             yind = ind[:, -1, :].ravel()
             for i in yind:
-                Ay.data[Ay.indptr[i]: \
+                Ay.data[Ay.indptr[i]:
                         Ay.indptr[i + 1]] = 0
             Ay.eliminate_zeros()
         else:
@@ -326,7 +336,7 @@ class TotalVariation(Function):
                   sparse.eye(p, p))
             xind = ind[-1, :, :].ravel()
             for i in xind:
-                Az.data[Az.indptr[i]: \
+                Az.data[Az.indptr[i]:
                         Az.indptr[i + 1]] = 0
             Az.eliminate_zeros()
         else:
@@ -434,7 +444,9 @@ class GroupLasso(Function):
         super(GroupLasso, self).__init__(l, A, rng=rng, **kwargs)
 
     def grad(self, x):
-        """Gradient of the function
+        """Gradient of the function.
+
+        Corresponds to
 
             f(x) = GroupLasso(x),
 
@@ -455,21 +467,22 @@ class GroupLasso(Function):
 
         Parameters:
         ----------
-        num_variables : Integer. The total number of variables, including the
-                intercept variable(s).
+        num_variables : int
+            The total number of variables, including the intercept variable(s).
 
-        groups : A list of lists. The outer list represents the groups and the
-                inner lists represent the variables in the groups. E.g.
-                [[1, 2], [2, 3]] contains two groups ([1, 2] and [2, 3]) with
-                variable 1 and 2 in the first group and variables 2 and 3 in
-                the second group.
+        groups : list of list
+            The outer list represents the groups and the inner lists represent
+            the variables in the groups. E.g. [[1, 2], [2, 3]] contains two
+            groups ([1, 2] and [2, 3]) with variable 1 and 2 in the first group
+            and variables 2 and 3 in the second group.
 
-        weights : List. Weights put on the groups. Default is weight 1 for each
-                group.
+        weights : list, optional
+            Weights put on the groups. Default is weight 1 for each group.
 
-        penalty_start : Non-negative integer. The number of variables to exempt
-                from penalisation. Equivalently, the first index to be
-                penalised. Default is 0, all variables are included.
+        penalty_start : integer, optional
+            Must be non-negative. The number of variables to exempt from
+            penalisation. Equivalently, the first index to be penalised.
+            Default is 0, all variables are included.
         """
         import scipy.sparse as sparse
 
@@ -503,7 +516,9 @@ class SmoothedTotalVariation(TotalVariation, NesterovFunction):
         super(SmoothedTotalVariation, self).__init__(l, A, mu=mu)
 
     def grad(self, x):
-        """Gradient of the function
+        """Gradient of the function.
+
+        Corresponds to
 
             f(x) = TotalVariation(mu, x),
 
@@ -543,7 +558,9 @@ class SmoothedGroupLasso(GroupLasso, NesterovFunction):
         super(SmoothedGroupLasso, self).__init__(l, A, mu=mu)
 
     def grad(self, x):
-        """Gradient of the function
+        """Gradient of the function.
+
+        Corresponds to
 
             f(x) = GroupLasso(mu, x),
 
@@ -566,7 +583,9 @@ class SmoothedGroupTotalVariation(NesterovFunction):
         super(SmoothedGroupTotalVariation, self).__init__(l, A, mu=mu)
 
     def grad(self, x):
-        """Gradient of the function
+        """Gradient of the function.
+
+        Corresponds to
 
             f(x) = GroupTotalVariation(mu, x),
 
@@ -576,8 +595,7 @@ class SmoothedGroupTotalVariation(NesterovFunction):
         return self.smoothed_grad(x)
 
     def project(self, a):
-        """ Projection onto the compact space of the smoothed Group TV
-        function.
+        """Projection onto the compact space of the smoothed Group TV function.
         """
         for g in xrange(0, len(a), 3):
 
@@ -605,15 +623,15 @@ class SmoothedGroupTotalVariation(NesterovFunction):
 
         Parameters
         ----------
-        masks : List of numpy arrays. The mask for each group. Each mask is an
-                integer (0 or 1) or boolean numpy array or the same shape as
-                the actual data. The mask does not involve any intercept
-                variables.
+        masks : list of numpy array
+            The mask for each group. Each mask is an integer (0 or 1) or
+            boolean numpy array or the same shape as the actual data. The mask
+            does not involve any intercept variables.
 
-        weights : List of floats. The weights account for different group
-                sizes, or incorporates some prior knowledge about the
-                importance of the groups. Default value is the square roots of
-                the group sizes.
+        weights : list of float, optional
+            The weights account for different group sizes, or incorporates some
+            prior knowledge about the importance of the groups. Default value
+            is the square roots of the group sizes.
         """
         if isinstance(masks, tuple):
             masks = list(masks)
@@ -643,30 +661,30 @@ class SmoothedGroupTotalVariation(NesterovFunction):
 
     @staticmethod
     def A_from_rects(rects, shape, weights=None):
-        """Generates the linear operator for the group total variation Nesterov
-        function from the rectange of a 3D image.
+        """Generates the linear operator for the group total variation
+        Nesterov function from the rectange of a 3D image.
 
         Parameters
         ----------
-        rects : List of lists or tuples with 2-, 4- or 6-tuple elements. The
-                shape of the patch of the 1D, 2D or 3D image to smooth. The
-                elements of rects has the form ((x1, x2),), ((y1, y2),
-                (x1, x2)) or ((z1, z2), (y1, y2), (x1, x2)), where z is the
-                "layers", y rows and x is the columns and x1 means the first
-                column to include, x2 is one beyond the last column to include,
-                and similarly for y and z. The rect does not involve any
-                intercept variables.
+        rects : list of list or tuples with 2-, 4- or 6-tuple elements
+            The shape of the patch of the 1D, 2D or 3D image to smooth. The
+            elements of rects has the form ((x1, x2),), ((y1, y2), (x1, x2))
+            or ((z1, z2), (y1, y2), (x1, x2)), where z is the "layers", y
+            rows and x is the columns and x1 means the first column to
+            include, x2 is one beyond the last column to include, and
+            similarly for y and z. The rect does not involve any intercept
+            variables.
 
-        shape : List or tuple with 1, 2 or 3 integers. The shape of the 1D, 2D
-                or 3D image. shape has the form (X,), (Y, X) or (Z, Y, X),
-                where Z is the number of "layers", Y is the number of rows and
-                X is the number of columns. The shape does not involve any
-                intercept variables.
+        shape : list or tuple with 1, 2 or 3 int
+            The shape of the 1D, 2D or 3D image. shape has the form (X,),
+            (Y, X) or (Z, Y, X), where Z is the number of "layers", Y is the
+            number of rows and X is the number of columns. The shape does
+            not involve any intercept variables.
 
-        weights : List of floats. The weights account for different group
-                sizes, or incorporates some prior knowledge about the
-                importance of the groups. Default value is the square roots of
-                the group sizes.
+        weights : list of float, optional
+            The weights account for different group sizes, or incorporates
+            some prior knowledge about the importance of the groups. Default
+            value is the square roots of the group sizes.
         """
         A = []
         G = len(rects)

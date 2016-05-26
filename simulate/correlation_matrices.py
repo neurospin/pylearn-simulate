@@ -19,8 +19,10 @@ __all__ = ["constant_correlation", "toeplitz_correlation"]
 
 
 def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
-    """ Returns a positive definite matrix, S, corresponding to a block
-    covariance matrix. Each block has the structure:
+    """ Returns a positive definite matrix, S.
+
+    The matrix S corresponds to a block covariance matrix. Each block has the
+    structure:
 
               [1, ..., rho_k]
         S_k = [...,  1,  ...],
@@ -38,37 +40,40 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
 
     Parameters
     ----------
-    p : Integer or list of integers. The number of variables for each group.
+    p : int or list of int
+        The number of variables for each group.
 
-    rho : Positive float or list of positive floats. The average correlation
-            between off-diagonal elements of S.
+    rho : float or list of floats.
+        Must be positive. The average correlation between off-diagonal elements
+        of S.
 
-    delta : Non-negative float in [0, 1). Baseline noise between groups. Only
-            used if the number of groups is greater than one. The baseline
-            noise is computed as
+    delta : float in [0, 1)
+        Baseline noise between groups. Only used if the number of groups is
+        greater than one. The baseline noise is computed as
 
-                delta * rho_min,
+            delta * rho_min,
 
-            and you must provide a delta such that 0 <= delta < 1.
+        and you must provide a delta such that 0 <= delta < 1.
 
-    eps : Non-negative float in [0, 1 - max(rho)). Entry-wise random noise.
-            This parameter determines the distribution of the noise. The noise
-            is approximately normally distributed with mean
+    eps : float in [0, 1 - max(rho))
+        Entry-wise random noise. This parameter determines the distribution of
+        the noise. The noise is approximately normally distributed with mean
 
-                delta * min(rho)
+            delta * min(rho)
 
-            and variance
+        and variance
 
-                (eps * (1 - max(rho))) ** 2.0 / 10.
+            (eps * (1 - max(rho))) ** 2.0 / 10.
 
-            You can thus control the noise by this parameter, but note that you
-            must have
+        You can thus control the noise by this parameter, but note that you
+        must have
 
-                0 <= eps < 1 - max(rho).
+            0 <= eps < 1 - max(rho).
 
     Returns
     -------
-    S : Numpy array. The correlation matrix.
+    S : Numpy array
+        The correlation matrix.
     """
     if not isinstance(rho, (list, tuple)):
         p = [p]
@@ -114,8 +119,10 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
 
 
 def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5):
-    """Returns a positive definite matrix, S, corresponding to a block
-    covariance matrix. Each block has the structure:
+    """Returns a positive definite matrix, S.
+
+    The matrix S corresponds to a block covariance matrix. Each block has the
+    structure:
 
               [            1,       rho_k^1, rho_k^2,     ..., rho_k^{p_k-1}]
               [      rho_k^1,             1, rho_k^1,     ..., rho_k^{p_k-2}]
@@ -135,26 +142,29 @@ def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5):
 
     Parameters
     ----------
-    p : Integer or list of integers. The numbers of variables for each group.
+    p : int or list of int
+        The numbers of variables for each group.
 
-    rho : Positive float or list of positive floats. The average correlation
-            between off-diagonal elements of S.
+    rho : float or list of float
+        Must be positive. The average correlation between off-diagonal elements
+        of S.
 
-    eps : Non-negative float in [0, 1). Maximum entry-wise random
-            noise. This parameter determines the distribution of the noise. The
-            noise is approximately normally distributed with zero mean and
-            variance
+    eps : float in [0, 1)
+        Maximum entry-wise random noise. This parameter determines the
+        distribution of the noise. The noise is approximately normally
+        distributed with zero mean and variance
 
-                (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2.0 / 10.
+            (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2.0 / 10.
 
-            You can thus control the noise by this parameter, but note that you
-            must have
+        You can thus control the noise by this parameter, but note that you
+        must have
 
-               0 <= eps < 1.
+           0 <= eps < 1.
 
     Returns
     -------
-    S : Numpy array. The correlation matrix.
+    S : Numpy array
+        The correlation matrix.
     """
     if not isinstance(rho, (list, tuple)):
         p = [p]
