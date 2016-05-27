@@ -88,7 +88,7 @@ class LinearRegressionData(SimulatedData):
             self.penalties = [penalties]
         self.X0 = X0
         self.intercept = bool(intercept)
-        self.e = e - np.mean(e) if intercept else e
+        self.e = e - np.mean(e) if self.intercept else e
         self.snr = float(snr) if snr is not None else None
 
     def load(self, beta):
