@@ -14,7 +14,6 @@ import numpy as np
 
 from utils import TOLERANCE
 from utils import RandomUniform
-from utils import norm2
 
 __all__ = ["Function", "L1", "SmoothedL1", "L2", "L2Squared",
            "NesterovFunction", "TotalVariation", "GroupLasso",
@@ -132,13 +131,13 @@ class L2(Function):
 
         where |x|_2 is the L2-norm.
         """
-        norm_beta = norm2(x)
+        norm_beta = np.linalg.norm(x)
         if norm_beta > TOLERANCE:
             return x / norm_beta
         else:
             D = x.shape[0]
             u = (self.rng(D, 1) * 2.0) - 1.0  # [-1, 1]^D
-            norm_u = norm2(u)
+            norm_u = np.linalg.norm(u)
             a = self.rng()  # [0, 1]
 
             return (self.l * (a / norm_u)) * u
@@ -151,14 +150,14 @@ class L2(Function):
 #
 #    where |x|_2 is the L2-norm.
 #    """
-#    norm_beta = norm2(beta)
+#    norm_beta = np.linalg.norm(beta)
 #    if norm_beta > TOLERANCE:
 #
 #        return beta / norm_beta
 #    else:
 #        D = beta.shape[0]
 #        u = (rng(D, 1) * 2.0) - 1.0  # [-1, 1]^D
-#        norm_u = norm2(u)
+#        norm_u = np.linalg.norm(u)
 #        a = rng()  # [0, 1]
 #
 #        return u * (a / norm_u)

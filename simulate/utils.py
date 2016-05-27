@@ -11,7 +11,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 
 __all__ = ['TOLERANCE', 'RandomUniform', 'ConstantValue',
-           'norm2', 'bisection_method']
+           'bisection_method']
 
 TOLERANCE = 5e-8
 
@@ -72,11 +72,6 @@ class ConstantValue(object):
 #    a = float(min(a, b))
 #    b = float(t)
 #    return (np.random.rand() * (b - a)) + a
-
-
-def norm2(x):
-
-    return np.sqrt(np.sum(x ** 2.0))
 
 
 def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
