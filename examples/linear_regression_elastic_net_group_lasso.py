@@ -149,8 +149,8 @@ def lr_en_gl():
 
     surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
                            antialiased=False, linewidth=0)
-    #antialiased=False
-    #ax.set_zlim(-1.01, 1.01)
+    # antialiased=False
+    # ax.set_zlim(-1.01, 1.01)
     ax.patch.set_facecolor('none')
     ax.view_init(azim=-30, elev=30)
 
@@ -181,6 +181,7 @@ def lr_en_gl():
 
 #    plt.savefig('lr_en_gl.pdf', bbox_inches='tight')
     plt.show()
+
 
 if __name__ == "__main__":
     lr_en_gl()

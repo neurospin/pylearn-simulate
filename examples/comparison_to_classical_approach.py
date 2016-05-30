@@ -60,7 +60,10 @@ def comparison():
 
     # Create loss function:
     function = functions.CombinedFunction()
-    function.add_function(losses.LinearRegression(X, y, mean=False))
+    if hasattr(function, 'add_loss'):  # API updates in pylearn-parsimony.
+        function.add_loss(losses.LinearRegression(X, y, mean=False))
+    else:
+        function.add_function(losses.LinearRegression(X, y, mean=False))
     function.add_prox(penalties.L1(l=l, penalty_start=1))
     function.add_penalty(penalties.L2Squared(l=1.0 - l, penalty_start=1))
 
@@ -68,8 +71,8 @@ def comparison():
     beta = [0.07615334, 0.01290186, 0.00202628, 0.02650592, 0.01641403,
             0.00832801, 0.00038979, 0.01853086, 0.02455442, 0.01755498,
             0.00469816, 0.0053463, -0.00264778, 0.0153526,  0.0015202,
-           -0.02408666, 0.00453764, -0.0053824, -0.02556995, 0.01089147,
-           -0.01863037, -0.00212071, -0.00307539, -0.00921482, 0.006925,
+            -0.02408666, 0.00453764, -0.0053824, -0.02556995, 0.01089147,
+            -0.01863037, -0.00212071, -0.00307539, -0.00921482, 0.006925,
             0.00129344, 0.0281662, -0.00918977, -0.00449054, 0.0056015,
             0.02220001, 0.00913151, 0.00354939, 0.00156542, 0.00280743,
             0.03130712, 0.02208781, -0.01251621, 0.01020952, 0.00578535,
@@ -78,7 +81,7 @@ def comparison():
             0.02302791, 0.02071631, 0.03381445, 0.00185127, 0.00165616,
             0.00503767, 0.05038607, -0.01219906, 0.01042271, 0.01825756,
             0.02385574, 0.03347443, 0.00415551, 0.00362776, 0.02530247,
-           -0.00496077, 0.02176268, -0.0286928, 0.0230842, 0.00629274,
+            -0.00496077, 0.02176268, -0.0286928, 0.0230842, 0.00629274,
             0.01643775, 0.03412733, 0.02470838, 0.04116392, 0.01187356,
             0.01273421, 0.00365497, 0.02987092, 0.01511648, -0.0004221,
             0.01879463, 0.04344603, 0.0272033, 0.01224449, 0.04655398,
@@ -153,7 +156,7 @@ def comparison():
     plt.xlabel(r"$\lambda$", fontsize=14)
     plt.ylabel(r"CV error", fontsize=14)
     plt.title(r"Cross-validated prediction error for different values of "
-               r"$\lambda$", fontsize=18)
+              r"$\lambda$", fontsize=18)
 
     plt.subplot(2, 1, 2)
     plt.plot(beta_star, '-g', linewidth=3)
@@ -161,13 +164,14 @@ def comparison():
     plt.plot(beta_cv, '-r')
     plt.xlabel(r"$\beta_j$", fontsize=14)
     plt.legend([r"$\beta^*$",
-                 r"$\beta_{Sim}$",
-                 r"$\beta_{CV}$"],
-                loc=2)
+                r"$\beta_{Sim}$",
+                r"$\beta_{CV}$"],
+               loc=2)
     plt.title(r"Regression vectors", fontsize=18)
 
     plt.tight_layout()
     plt.show()
+
 
 if __name__ == "__main__":
     comparison()

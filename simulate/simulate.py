@@ -11,6 +11,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import abc
 
 import numpy as np
+import scipy.optimize
 
 import utils
 
@@ -116,10 +117,9 @@ class LinearRegressionData(SimulatedData):
                     return (np.linalg.norm(np.dot(X, x * beta))
                             / np.linalg.norm(self.e)) - old_snr
 
-                snr = utils.bisection_method(f,
-                                             low=0.0,
-                                             high=np.sqrt(old_snr),
-                                             maxiter=30)
+                low, high = utils.find_bisect_interval(f,
+                                                       low=0.0, high=old_snr)
+                snr = scipy.optimize.bisect(f, low, high)
 
             finally:
                 self.snr = old_snr
