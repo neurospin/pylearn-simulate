@@ -8,10 +8,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import utils
 import beta
 import correlation_matrices
 import functions
-import utils
 
 from .simulate import LinearRegressionData
 

@@ -7,13 +7,19 @@ Generates correlation matrices using two of the approaches described in:
 
 Created on Wed Jun 19 13:56:24 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2016, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
 import numpy as np
+import scipy.linalg
+
+try:
+    from . import utils
+except ValueError:
+    import simulate.utils as utils
 
 __all__ = ["constant_correlation", "toeplitz_correlation"]
 
@@ -35,7 +41,7 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
         S = [delta, S_i, delta],
             [delta, delta, S_N]
 
-    i.e. with the groups-correlation matrices on the diagonal and delta (on
+    i.e. with the group-correlation matrices on the diagonal and delta (on
     average) outside.
 
     Parameters
@@ -47,23 +53,20 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
         Must be positive. The average correlation between off-diagonal elements
         of S.
 
-    delta : float in [0, 1)
+    delta : float in [0, min(rho))
         Baseline noise between groups. Only used if the number of groups is
-        greater than one. The baseline noise is computed as
-
-            delta * rho_min,
-
-        and you must provide a delta such that 0 <= delta < 1.
+        greater than one. You must provide a delta such that
+        0 <= delta < min(rho).
 
     eps : float in [0, 1 - max(rho))
         Entry-wise random noise. This parameter determines the distribution of
         the noise. The noise is approximately normally distributed with mean
 
-            delta * min(rho)
+            delta
 
         and variance
 
-            (eps * (1 - max(rho))) ** 2.0 / 10.
+            eps ** 2.0 / 10.
 
         You can thus control the noise by this parameter, but note that you
         must have
@@ -75,9 +78,17 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
     S : Numpy array
         The correlation matrix.
     """
-    if not isinstance(rho, (list, tuple)):
+    if not isinstance(p, (list, tuple)):
         p = [p]
+    if not isinstance(rho, (list, tuple)):
         rho = [rho]
+
+    for i in range(len(p)):
+        p[i] = int(p[i])
+
+    # Correct values if outside feasible interval.
+    for i in range(len(rho)):
+        rho[i] = max(0.0, min(float(rho[i]), 1.0 - utils.TOLERANCE))
 
     K = len(rho)
 
@@ -85,8 +96,8 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
     N = 0
     rho_min = min(rho)
     rho_max = max(rho)
-    eps = eps * (1.0 - rho_max)
-    delta = delta * rho_min
+    delta = max(0.0, min(float(delta), rho_min - utils.TOLERANCE))
+    eps = max(0.0, min(float(eps), 1.0 - rho_max))
 
     for k in xrange(K):
         N += p[k]
@@ -98,6 +109,7 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
     uu[uu > 1.0] = 1.0
     uu[uu < -1.0] = -1.0
 
+    S = np.zeros(uu.shape)
     S = delta + eps * uu
 
     Nk = 0
@@ -106,8 +118,8 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
         Nk += pk
 
         uuk = uu[Nk - pk:Nk, Nk - pk:Nk]
-        Sk = rho[k] + eps * uuk
-        Sk -= np.diag(np.diag(Sk)) - np.eye(*Sk.shape)
+        Sk = rho[k] + eps * uuk  # Noise in kth group.
+        Sk -= np.diag(np.diag(Sk)) - np.eye(*Sk.shape)  # Add 1 to the diagonal
 
         S[Nk - pk:Nk, Nk - pk:Nk] = Sk
 
@@ -147,7 +159,7 @@ def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5):
 
     rho : float or list of float
         Must be positive. The average correlation between off-diagonal elements
-        of S.
+        of S_k.
 
     eps : float in [0, 1)
         Maximum entry-wise random noise. This parameter determines the
@@ -188,16 +200,11 @@ def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5):
         pk = p[k]
         Nk += pk
         rhok = rho[k]
-        v = [0] * (pk - 1)
-        for i in xrange(0, pk - 1):
-            v[i] = rhok ** (i + 1)
 
-        Sk = np.eye(pk, pk)
-        Sk[0, 1:] = v
-        Sk[1:, 0] = v
-        for i in xrange(1, pk - 1):
-            Sk[i, i + 1:] = v[:-i]
-            Sk[i + 1:, i] = v[:-i]
+        v = [1.0] * pk
+        for i in xrange(1, pk):
+            v[i] = rhok ** i
+        Sk = scipy.linalg.toeplitz(v)
 
         S[Nk - pk:Nk, Nk - pk:Nk] = Sk
 
@@ -208,6 +215,7 @@ def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5):
 #    print "cond(S) = %.5f <= %.5f" % (np.linalg.cond(S), k)
 
     return S
+
 
 if __name__ == "__main__":
     import doctest

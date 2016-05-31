@@ -62,6 +62,7 @@ def random(shape, density=1.0, rng=utils.RandomUniform(0, 1).rand,
 
     return beta
 
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
