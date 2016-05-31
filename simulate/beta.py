@@ -14,7 +14,7 @@ import utils
 __all__ = ["random"]
 
 
-def random(shape, density=1.0, rng=utils.RandomUniform(0, 1).rand,
+def random(shape, density=1.0, rng=utils.RandomUniform(0, 1),
            sort=False, normalise=False):
     """Generates a random p-by-1 vector.
 
@@ -27,7 +27,7 @@ def random(shape, density=1.0, rng=utils.RandomUniform(0, 1).rand,
         elements). Zero-elements will be randomly distributed in the vector.
         Default is 1.0.
 
-    rng : function, optional
+    rng : function or callable, optional
         The random number generator. Must be a function that takes *shape as
         input. Default is utils.RandomUniform in the interval [0, 1).
 

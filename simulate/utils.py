@@ -8,6 +8,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import abc
+
 import numpy as np
 
 __all__ = ['TOLERANCE', 'RandomUniform', 'ConstantValue',
@@ -16,7 +18,21 @@ __all__ = ['TOLERANCE', 'RandomUniform', 'ConstantValue',
 TOLERANCE = 5e-8
 
 
-class RandomUniform(object):
+class RandomNumberGenerator(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, random_state=None):
+
+        self.random_state = random_state
+
+    @abc.abstractmethod
+    def __call__(self, *d):
+        raise NotImplementedError('Abstract method "__call__" must be '
+                                  'specialised!')
+
+
+class RandomUniform(RandomNumberGenerator):
     """Random number generator that returns a uniformly distributed value.
 
     Example
@@ -28,24 +44,28 @@ class RandomUniform(object):
     array([[..., ...],
            [..., ...]])
     """
-    def __init__(self, a=0, b=1):
+    def __init__(self, a=0.0, b=1.0, random_state=None):
 
-        self.a = float(a)
-        self.b = float(b)
+        super(RandomUniform, self).__init__(random_state=random_state)
 
-    def rand(self, *d):
-
-        R = np.random.rand(*d)
-        R = R * (self.b - self.a) + self.a
-
-        return R
+        a = float(a)
+        b = float(b)
+        a, b = min(a, b), max(a, b)
+        self.a = a
+        self.b = b
 
     def __call__(self, *d):
 
-        return self.rand(*d)
+        if self.random_state is not None:
+            R = self.random_state.uniform(self.a, self.b, d)
+        else:
+            R = np.random.rand(*d)
+            R = R * (self.b - self.a) + self.a
+
+        return R
 
 
-class ConstantValue(object):
+class ConstantValue(RandomNumberGenerator):
     """Random-like number generator that returns a constant value.
 
     Example
@@ -57,7 +77,7 @@ class ConstantValue(object):
     array([[ 5.,  5.],
            [ 5.,  5.]])
     """
-    def __init__(self, val):
+    def __init__(self, val, random_state=None):
 
         self.val = val
 
