@@ -48,7 +48,13 @@ def random(shape, density=1.0, rng=utils.RandomUniform(0, 1),
 
     beta = rng(p)
     beta[ps:] = 0.0
-    beta = np.random.permutation(beta)
+
+    # Use and update the random number generator for permuting beta
+    random_state = np.random.RandomState()
+    random_state.set_state(rng.get_state())
+    beta = random_state.permutation(beta)
+    rng.set_state(random_state.get_state())
+#    beta = np.random.permutation(beta)
 
     if sort:
         beta = np.reshape(beta, shape)

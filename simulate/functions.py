@@ -132,7 +132,7 @@ class L2(Function):
         """
         norm_beta = np.linalg.norm(x)
         if norm_beta > utils.TOLERANCE:
-            return x / norm_beta
+            return (self.l / norm_beta) * x
         else:
             D = x.shape[0]
             u = (self.rng(D, 1) * 2.0) - 1.0  # [-1, 1]^D
@@ -439,7 +439,7 @@ class GroupLasso(Function):
 
     def __init__(self, l, A, rng=utils.RandomUniform(-1, 1), **kwargs):
 
-        super(GroupLasso, self).__init__(l, A, rng=rng, **kwargs)
+        super(GroupLasso, self).__init__(l, A=A, rng=rng, **kwargs)
 
     def grad(self, x):
         """Gradient of the function.
@@ -450,11 +450,12 @@ class GroupLasso(Function):
 
         where GroupLasso(x) is the group lasso (l1-l2) function.
         """
+        l2 = L2(1.0, rng=self.rng)
         grad_Ab = 0
         for i in xrange(len(self.A)):
             Ai = self.A[i]
             Ab = Ai.dot(x)
-            grad_Ab += Ai.T.dot(L2.grad(Ab, self.rng))
+            grad_Ab += Ai.T.dot(l2.grad(Ab))
 
         return self.l * grad_Ab
 

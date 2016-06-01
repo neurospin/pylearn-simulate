@@ -24,12 +24,21 @@ class RandomNumberGenerator(object):
 
     def __init__(self, random_state=None):
 
-        self.random_state = random_state
+        if random_state is None:
+            self.random_state = np.random.RandomState()
+        else:
+            self.random_state = random_state
 
     @abc.abstractmethod
     def __call__(self, *d):
         raise NotImplementedError('Abstract method "__call__" must be '
                                   'specialised!')
+
+    def set_state(self, state):
+        self.random_state.set_state(state)
+
+    def get_state(self):
+        return self.random_state.get_state()
 
 
 class RandomUniform(RandomNumberGenerator):
@@ -78,6 +87,8 @@ class ConstantValue(RandomNumberGenerator):
            [ 5.,  5.]])
     """
     def __init__(self, val, random_state=None):
+
+        super(ConstantValue, self).__init__(random_state=random_state)
 
         self.val = val
 
