@@ -20,7 +20,11 @@ def lr_en_tv():
     print "=== Example with linear regression, elastic net and total variation ==="
     print "======================================================================="
 
-    np.random.seed(42)
+#    np.random.seed(42)
+    random_state = np.random.RandomState(42)
+    state = random_state.get_state()
+    rng01 = simulate.utils.RandomUniform(0, 1, random_state=random_state)
+    rng_11 = simulate.utils.RandomUniform(-1, 1, random_state=random_state)
 
     test = False
 
@@ -28,11 +32,12 @@ def lr_en_tv():
     n, p = 48, np.prod(shape)
 
     # Generate candidate data.
-    beta = simulate.beta.random((p, 1), density=0.5, sort=True)
+    beta = simulate.beta.random((p, 1), density=0.5, sort=True, rng=rng01)
     Sigma = simulate.correlation_matrices.constant_correlation(p=p, rho=0.01,
-                                                               eps=0.001)
-    X0 = np.random.multivariate_normal(np.zeros(p), Sigma, n)
-    e = np.random.randn(n, 1)
+                                                               eps=0.001,
+                                                               random_state=random_state)
+    X0 = random_state.multivariate_normal(np.zeros(p), Sigma, n)
+    e = random_state.randn(n, 1)
 
     # Generate the linear operator for total variation.
     A = simulate.functions.TotalVariation.A_from_shape(shape)
@@ -43,10 +48,11 @@ def lr_en_tv():
     g = 1.0  # TV coefficient.
 
     # Create the optimisation problem.
-    np.random.seed(42)
-    l1 = simulate.functions.L1(l)
+#    np.random.seed(42)
+    random_state.set_state(state)
+    l1 = simulate.functions.L1(l, rng=rng_11)
     l2 = simulate.functions.L2Squared(k)
-    tv = simulate.functions.TotalVariation(g, A)
+    tv = simulate.functions.TotalVariation(g, A, rng=rng01)
     lr = simulate.LinearRegressionData([l1, l2, tv], X0, e, snr=3.0,
                                        intercept=False)
 
@@ -106,7 +112,6 @@ def lr_en_tv():
         l = 1.0 - k
         for j in range(len(gs)):
             g = gs[j]
-            print "k:", k, ", g:", g
 
             # Create the loss function.
             function = LinearRegressionL1L2TV(X, y, l, k, g, A=A, mu=mu,
@@ -125,6 +130,8 @@ def lr_en_tv():
             err_f[i, j] = np.linalg.norm(function.f(beta)
                                          - function.f(beta_star))
 
+            print "k: %.3f, g: %.3f, err_f: %.12f" % (k, g, err_f[i, j])
+
     print "err_beta:\n", err_beta
     print "err_f:\n", err_f
 
@@ -135,7 +142,8 @@ def lr_en_tv():
     import matplotlib.pyplot as plt
     import pylab
 
-    np.random.seed(42)
+#    np.random.seed(42)
+    random_state.set_state(state)
 
     # Plot results.
     fig = plt.figure()

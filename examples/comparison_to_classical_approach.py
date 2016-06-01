@@ -33,22 +33,26 @@ def comparison():
               "able to fit a model to the data."
         return
 
-    np.random.seed(42)
+#    np.random.seed(42)
+    random_state = np.random.RandomState(42)
+    rng01 = simulate.utils.RandomUniform(0, 1, random_state=random_state)
+    rng_11 = simulate.utils.RandomUniform(-1, 1, random_state=random_state)
 
     # Generate a start vector, beta_0, a candidate data set, X_0, and the
     # residual vector, epsilon:
     n, p = 50, 100
-    beta = simulate.beta.random((p + 1, 1), density=0.5, sort=True)
+    beta = simulate.beta.random((p + 1, 1), density=0.5, sort=True, rng=rng01)
     Sigma = simulate.correlation_matrices.constant_correlation(p=p, rho=0.1,
-                                                               eps=0.01)
-    X0 = np.random.multivariate_normal(np.zeros(p), Sigma, n)
+                                                               eps=0.01,
+                                                               random_state=random_state)
+    X0 = random_state.multivariate_normal(np.zeros(p), Sigma, n)
     # Add a column of ones for the intercept
     X0 = np.hstack((np.ones((n, 1)), X0))
-    e = 0.1 * np.random.randn(n, 1)
+    e = 0.1 * random_state.randn(n, 1)
 
     # Create the penalties:
     l = 0.618
-    l1 = simulate.functions.L1(0.618)
+    l1 = simulate.functions.L1(0.618, rng=rng_11)
     l2 = simulate.functions.L2Squared(1.0 - l)
 
     # Create the loss function:

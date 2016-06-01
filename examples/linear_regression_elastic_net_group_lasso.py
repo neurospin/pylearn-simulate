@@ -20,7 +20,11 @@ def lr_en_gl():
     print "=== Example with linear regression, elastic net and group lasso ==="
     print "==================================================================="
 
-    np.random.seed(42)
+#    np.random.seed(42)
+    random_state = np.random.RandomState(42)
+    state = random_state.get_state()
+    rng01 = simulate.utils.RandomUniform(0, 1, random_state=random_state)
+    rng_11 = simulate.utils.RandomUniform(-1, 1, random_state=random_state)
 
     test = False
 
@@ -31,16 +35,17 @@ def lr_en_gl():
     groups = [range(1, 2 * p / 3), range(p / 3, p)]
 
     # Generate candidate data.
-    beta = simulate.beta.random((p - 1, 1), density=0.5, sort=True)
+    beta = simulate.beta.random((p - 1, 1), density=0.5, sort=True, rng=rng01)
     # Add the intercept.
-    beta = np.vstack((np.random.rand(1, 1), beta))
+    beta = np.vstack((random_state.rand(1, 1), beta))
     Sigma = simulate.correlation_matrices.constant_correlation(p=p - 1,
                                                                rho=0.01,
-                                                               eps=0.001)
-    X0 = np.random.multivariate_normal(np.zeros(p - 1), Sigma, n)
+                                                               eps=0.001,
+                                                               random_state=random_state)
+    X0 = random_state.multivariate_normal(np.zeros(p - 1), Sigma, n)
     # Add the intercept.
     X0 = np.hstack((np.ones((n, 1)), X0))
-    e = np.random.randn(n, 1)
+    e = random_state.randn(n, 1)
 
     # Create linear operator.
     A = simulate.functions.SmoothedGroupLasso.A_from_groups(p, groups,
@@ -53,7 +58,7 @@ def lr_en_gl():
     g = 1.618    # TV coefficient.
 
     # Create optimisation problem.
-    l1 = simulate.functions.L1(l)
+    l1 = simulate.functions.L1(l, rng=rng_11)
     l2 = simulate.functions.L2Squared(k)
     gl = simulate.functions.SmoothedGroupLasso(g, A,
                                                mu=simulate.utils.TOLERANCE)
@@ -61,7 +66,8 @@ def lr_en_gl():
                                        intercept=True)
 
     # Generate simulated data.
-    np.random.seed(42)
+#    np.random.seed(42)
+    random_state.set_state(state)
     X, y, beta_star, e = lr.load(beta)
 
     # Define algorithm parameters.
@@ -109,7 +115,6 @@ def lr_en_gl():
         k = 1.0 - l
         for j in range(len(gs)):
             g = gs[j]
-            print "l:", l, ", g:", g
 
             # Create the loss function.
             function = LinearRegressionL1L2GL(X, y, l, k, g, A=A,
@@ -128,6 +133,8 @@ def lr_en_gl():
             err_f[i, j] = np.linalg.norm(function.f(beta)
                                          - function.f(beta_star))
 
+            print "l: %.3f, g: %.3f, err_f: %.12f" % (l, g, err_f[i, j])
+
     print "err_beta:\n", err_beta
     print "err_f:\n", err_f
 
@@ -138,7 +145,8 @@ def lr_en_gl():
     import matplotlib.pyplot as plt
     import pylab
 
-    np.random.seed(42)
+#    np.random.seed(42)
+    random_state.set_state(state)
 
     # Plot results.
     fig = plt.figure()

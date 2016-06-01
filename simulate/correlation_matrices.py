@@ -24,7 +24,8 @@ except ValueError:
 __all__ = ["constant_correlation", "toeplitz_correlation"]
 
 
-def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
+def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5,
+                         random_state=None):
     """ Returns a positive definite matrix, S.
 
     The matrix S corresponds to a block covariance matrix. Each block has the
@@ -73,6 +74,10 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
 
             0 <= eps < 1 - max(rho).
 
+    random_state : numpy.random.RandomState, optional
+        An instance of numpy.random.RandomState. Used when generating
+        pseudo-random numbers.
+
     Returns
     -------
     S : Numpy array
@@ -102,7 +107,10 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
     for k in xrange(K):
         N += p[k]
 
-    u = np.random.randn(M, N)
+    if random_state is not None:
+        u = random_state.randn(M, N)
+    else:
+        u = np.random.randn(M, N)
 #    u = (np.random.rand(M, N) * 2.0) - 1.0
     u /= np.sqrt(np.sum(u ** 2.0, axis=0))  # Normalise
     uu = np.dot(u.T, u)  # ~N(0, 1 / M)
@@ -130,7 +138,7 @@ def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
     return S
 
 
-def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5):
+def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5, random_state=None):
     """Returns a positive definite matrix, S.
 
     The matrix S corresponds to a block covariance matrix. Each block has the
@@ -157,39 +165,55 @@ def toeplitz_correlation(p=[100], rho=[0.05], eps=0.5):
     p : int or list of int
         The numbers of variables for each group.
 
-    rho : float or list of float
-        Must be positive. The average correlation between off-diagonal elements
-        of S_k.
+    rho : float or list of floats in [0, 1)
+        The average correlation between off-diagonal elements of S_k.
 
     eps : float in [0, 1)
         Maximum entry-wise random noise. This parameter determines the
         distribution of the noise. The noise is approximately normally
         distributed with zero mean and variance
 
-            (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2.0 / 10.
+            eps ** 2.0 / 10.
 
         You can thus control the noise by this parameter, but note that you
         must have
 
-           0 <= eps < 1.
+           0 <= eps < (1 - max(rho)) / (1 + max(rho)).
+
+    random_state : numpy.random.RandomState, optional
+        An instance of numpy.random.RandomState. Used when generating
+        pseudo-random numbers.
 
     Returns
     -------
     S : Numpy array
         The correlation matrix.
     """
-    if not isinstance(rho, (list, tuple)):
+    if not isinstance(p, (list, tuple)):
         p = [p]
+    if not isinstance(rho, (list, tuple)):
         rho = [rho]
+
+    for i in range(len(p)):
+        p[i] = int(p[i])
+
+    # Correct values if outside feasible interval.
+    for i in range(len(rho)):
+        rho[i] = max(0.0, min(float(rho[i]), 1.0 - utils.TOLERANCE))
 
     K = len(rho)
 
     M = 10  # Dim. of noise space. uu approx ~N(0, 1 / M)
     N = sum(p)
     rho_max = max(rho)
-    eps = eps * (1.0 - rho_max) / (1.0 + rho_max)
+    eps = max(utils.TOLERANCE,
+              min(float(eps),
+                  (1.0 - rho_max) / (1.0 + rho_max)) - utils.TOLERANCE)
 
-    u = np.random.randn(M, N)
+    if random_state is not None:
+        u = random_state.randn(M, N)
+    else:
+        u = np.random.randn(M, N)
 #    u = (np.random.rand(M, N) * 2.0) - 1.0
     u /= np.sqrt(np.sum(u ** 2.0, axis=0))  # Normalise
     uu = np.dot(u.T, u)  # ~N(0, 1 / M)

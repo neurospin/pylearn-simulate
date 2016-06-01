@@ -12,8 +12,7 @@ import abc
 
 import numpy as np
 
-from utils import TOLERANCE
-from utils import RandomUniform
+import utils
 
 __all__ = ["Function", "L1", "SmoothedL1", "L2", "L2Squared",
            "NesterovFunction", "TotalVariation", "GroupLasso",
@@ -40,7 +39,7 @@ class Function(object):
 
 class L1(Function):
 
-    def __init__(self, l, rng=RandomUniform(-1, 1)):
+    def __init__(self, l, rng=utils.RandomUniform(-1, 1)):
 
         super(L1, self).__init__(l, rng=rng)
 
@@ -54,9 +53,9 @@ class L1(Function):
         where |x|_1 is the L1-norm.
         """
         grad = np.zeros((x.shape[0], 1))
-        grad[x >= TOLERANCE] = 1.0
-        grad[x <= -TOLERANCE] = -1.0
-        between = (x > -TOLERANCE) & (x < TOLERANCE)
+        grad[x >= utils.TOLERANCE] = 1.0
+        grad[x <= -utils.TOLERANCE] = -1.0
+        between = (x > -utils.TOLERANCE) & (x < utils.TOLERANCE)
         grad[between] = self.rng(between.sum())
 
         return self.l * grad
@@ -80,7 +79,7 @@ class L1(Function):
 
 class SmoothedL1(Function):
 
-    def __init__(self, l, mu=TOLERANCE):
+    def __init__(self, l, mu=utils.TOLERANCE):
 
         super(SmoothedL1, self).__init__(l, mu=mu)
 
@@ -118,7 +117,7 @@ class SmoothedL1(Function):
 
 class L2(Function):
 
-    def __init__(self, l, rng=RandomUniform(0, 1)):
+    def __init__(self, l, rng=utils.RandomUniform(0, 1)):
 
         super(L2, self).__init__(l, rng=rng)
 
@@ -132,7 +131,7 @@ class L2(Function):
         where |x|_2 is the L2-norm.
         """
         norm_beta = np.linalg.norm(x)
-        if norm_beta > TOLERANCE:
+        if norm_beta > utils.TOLERANCE:
             return x / norm_beta
         else:
             D = x.shape[0]
@@ -195,8 +194,8 @@ class NesterovFunction(Function):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, l, A, mu=TOLERANCE, rng=RandomUniform(-1, 1),
-                 norm=L2.grad, **kwargs):
+    def __init__(self, l, A, mu=utils.TOLERANCE,
+                 rng=utils.RandomUniform(-1, 1), norm=L2.grad, **kwargs):
 
         super(NesterovFunction, self).__init__(l, rng=rng, norm=norm, **kwargs)
 
@@ -249,7 +248,7 @@ class NesterovFunction(Function):
 
 class TotalVariation(Function):
 
-    def __init__(self, l, A, rng=RandomUniform(0, 1), **kwargs):
+    def __init__(self, l, A, rng=utils.RandomUniform(0, 1), **kwargs):
 
         super(TotalVariation, self).__init__(l, A=A, rng=rng, **kwargs)
 
@@ -266,11 +265,11 @@ class TotalVariation(Function):
         Ab = np.vstack([Ai.dot(beta_flat) for Ai in self.A]).T
         Ab_norm2 = np.sqrt(np.sum(Ab ** 2.0, axis=1))
 
-        upper = Ab_norm2 > TOLERANCE
+        upper = Ab_norm2 > utils.TOLERANCE
         grad_Ab_norm2 = Ab
         grad_Ab_norm2[upper] = (Ab[upper].T / Ab_norm2[upper]).T
 
-        lower = Ab_norm2 <= TOLERANCE
+        lower = Ab_norm2 <= utils.TOLERANCE
         n_lower = lower.sum()
 
         if n_lower:
@@ -438,7 +437,7 @@ class TotalVariation(Function):
 
 class GroupLasso(Function):
 
-    def __init__(self, l, A, rng=RandomUniform(-1, 1), **kwargs):
+    def __init__(self, l, A, rng=utils.RandomUniform(-1, 1), **kwargs):
 
         super(GroupLasso, self).__init__(l, A, rng=rng, **kwargs)
 
@@ -510,7 +509,7 @@ class GroupLasso(Function):
 
 class SmoothedTotalVariation(TotalVariation, NesterovFunction):
 
-    def __init__(self, l, A, mu=TOLERANCE):
+    def __init__(self, l, A, mu=utils.TOLERANCE):
 
         super(SmoothedTotalVariation, self).__init__(l, A, mu=mu)
 
@@ -552,7 +551,7 @@ class SmoothedTotalVariation(TotalVariation, NesterovFunction):
 
 class SmoothedGroupLasso(GroupLasso, NesterovFunction):
 
-    def __init__(self, l, A, mu=TOLERANCE):
+    def __init__(self, l, A, mu=utils.TOLERANCE):
 
         super(SmoothedGroupLasso, self).__init__(l, A, mu=mu)
 
@@ -577,7 +576,7 @@ class SmoothedGroupLasso(GroupLasso, NesterovFunction):
 
 class SmoothedGroupTotalVariation(NesterovFunction):
 
-    def __init__(self, l, A, mu=TOLERANCE):
+    def __init__(self, l, A, mu=utils.TOLERANCE):
 
         super(SmoothedGroupTotalVariation, self).__init__(l, A, mu=mu)
 
