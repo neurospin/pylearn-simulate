@@ -14,7 +14,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 params = dict(name="pylearn-simulate",
-              version="0.2",
+              version="0.2.1",
               author="See contributors on https://github.com/neurospin/pylearn-simulate",
               author_email="lofstedt.tommy@gmail.com",
               maintainer="Tommy Löfstedt",
@@ -47,8 +47,10 @@ try:
                                  ]
     params["extras_require"] = {"examples": ["parsimony>=0.2.1", "matplotlib>=1.1.1rc"],
                                 "test": ["doctest"],
+                                "tests": ["doctest", "nose", "unittest"],
                                }
 except:
     from distutils.core import setup
 
 setup(**params)
+
