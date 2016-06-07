@@ -90,8 +90,18 @@ Download the release of pylearn-simulate from
 [https://github.com/neurospin/pylearn-simulate/releases](https://github.com/neurospin/pylearn-simulate/releases).
 Unpack the file, go to the pylearn-simulate directory and type:
 ```
+$ python setup.py install --user
+```
+for a local installation in the user's *userbase* directory (usually in
+`~/.local/lib/python2.7/site-packages` on Unix-like/-based operating systems,
+such as Linux and OS X, and in
+`%AppData%\Python\Python27\site-packages` on Windows), or
+```
 $ sudo python setup.py install
 ```
+for a global installation accessible to all users. You will need to have administrator rights on
+your computer in order to install software for all users.
+
 You are now ready to use your fresh installation of pylearn-simulate!
 
 
