@@ -24,7 +24,7 @@ except ValueError:
 __all__ = ["constant_correlation", "toeplitz_correlation"]
 
 
-def constant_correlation(p=[100], rho=[0.05], delta=0.10, eps=0.5,
+def constant_correlation(p=[100], rho=[0.05], delta=0.05, eps=0.5,
                          random_state=None):
     """ Returns a positive definite matrix, S.
 
