@@ -551,7 +551,7 @@ omega[class=="COG"] <- - betastar[class=="COG"]/norm2(betastar[class=="COG"])
 omega <- (omega - betastar) / drop( t(X_0)%*%epsilon )
 ```
 Finally, the weights $\omega_j$ are applied to each column of $X_0$ to obtain $X$ and $y$ is computed by using $X$, $\beta^*$ and $\epsilon$. 
-```{rcompute_X_and_y}
+```{r compute_X_and_y}
 X <- X_0 %*% diag(omega)
 y <- X %*% betastar - epsilon
 ```
