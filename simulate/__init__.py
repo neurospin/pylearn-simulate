@@ -2,7 +2,7 @@
 """
 Created on Mon Jun 18 09:26:14 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2018, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -15,7 +15,7 @@ import functions
 
 from .simulate import LinearRegressionData
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 __all__ = ["LinearRegressionData",
            'beta', 'correlation_matrices', 'functions',

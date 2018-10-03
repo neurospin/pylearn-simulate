@@ -2,7 +2,7 @@
 """
 Created on Sat Mar  7 12:16:19 2015
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2018, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -14,7 +14,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 params = dict(name="pylearn-simulate",
-              version="0.2.1",
+              version="0.2.2",
               author="See contributors on https://github.com/neurospin/pylearn-simulate",
               author_email="lofstedt.tommy@gmail.com",
               maintainer="Tommy Löfstedt",
