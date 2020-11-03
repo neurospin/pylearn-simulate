@@ -111,3 +111,11 @@ You are now ready to use your fresh installation of pylearn-simulate!
 Examples
 --------
 See the examples in `pylearn-simulate/examples/`.
+
+
+
+
+
+References
+==========
+Tommy Löfstedt, Vincent Guillemot, Vincent Frouin, Edouard Duchesnay, and Fouad Hadj-Selem. Simulated Data for Linear Regression with Structured and Sparse Penalties: Introducing pylearn-simulate. _Journal of Statistical Software_, 87(3), 2018. [https://www.jstatsoft.org/article/view/v087i03](https://www.jstatsoft.org/article/view/v087i03).
